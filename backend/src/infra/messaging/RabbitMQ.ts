@@ -19,13 +19,13 @@ export class QueueBrowserRabbitMq implements QueueBrowser {
     return response.data;
   }
 
-  async listMessages(queueName: string): Promise<any[]> {
+  async listMessages(queueName: string, limit: number): Promise<any[]> {
     const response = await useAxios<any[]>({
-      url: `${this.baseUrl}/api/queues/%2F/${queueName}/get`,
+      url: `${this.baseUrl}/api/queues/${encodeURIComponent('/')}/${encodeURIComponent(queueName)}/get`,
       method: 'POST',
       token: `Basic ${this.token}`,
       data: {
-        count: 1000,
+        count: limit,
         ackmode: 'ack_requeue_true', 
         encoding: 'auto'
       }

@@ -32,9 +32,13 @@ rabbitMq.get('/queues', async (req, res) => {
 rabbitMq.get('/queues/:queueName/messages', async (req, res) => {
   try {
     const { queueName } = req.params;
-    
-    const messages = await listMessagesUseCase.execute(queueName);
-    return res.status(200).json(messages);
+    const limit = parseInt(req.query.limit as string) || 20;
+
+    const messages = await listMessagesUseCase.execute(queueName, limit);
+    return res.status(200).json({
+      data: messages,
+      count: messages.length
+    });
   } catch (error: any) {
     return res.status(500).json({
       message: error.message

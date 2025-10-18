@@ -7,8 +7,8 @@ export default class ListMessages {
     this.browser = browser;
   }
 
-    async execute(queueName: string): Promise<QueueBrowserMessageInterface[]> {
-      const queueList = await this.browser.listMessages(queueName);
+    async execute(queueName: string, limit: number): Promise<QueueBrowserMessageInterface[]> {
+      const queueList = await this.browser.listMessages(queueName, limit);
   
       return queueList.map((message: any, index: number) => {
         const payload = JSON.parse(message.payload || '{}');

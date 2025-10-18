@@ -11,5 +11,5 @@ export interface QueueBrowserMessageInterface {
 
 export interface QueueBrowser {
     listQueues(): Promise<QueueBrowserInterface[]>;
-    listMessages(queueName: string): Promise<QueueBrowserMessageInterface[]>;
+    listMessages(queueName: string, limit: number): Promise<QueueBrowserMessageInterface[]>;
 }
