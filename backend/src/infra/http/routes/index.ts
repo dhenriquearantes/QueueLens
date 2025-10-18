@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', (req, res) => {
     return res.status(201).json({
-        response: 'QueueHoleView online'
+        response: 'QueueLens online'
     })
 })
 

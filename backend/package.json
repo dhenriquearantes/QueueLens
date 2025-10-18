@@ -1,5 +1,5 @@
 {
-  "name": "queueholeview",
+  "name": "queuelens",
   "version": "1.0.0",
   "description": "Queue view",
   "main": "index.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dhenriquearantes/QueueHoleView.git"
+    "url": "git+https://github.com/dhenriquearantes/QueueLens.git"
   },
   "author": "Divino H. Arantes",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/dhenriquearantes/QueueHoleView/issues"
+    "url": "https://github.com/dhenriquearantes/QueueLens/issues"
   },
-  "homepage": "https://github.com/dhenriquearantes/QueueHoleView#readme",
+  "homepage": "https://github.com/dhenriquearantes/QueueLens#readme",
   "dependencies": {
     "@types/axios": "^0.9.36",
     "axios": "^1.12.2",

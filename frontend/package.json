@@ -1,7 +1,7 @@
 {
-  "name": "queueholeview-frontend",
+  "name": "queuelens-frontend",
   "version": "1.0.0",
-  "description": "QueueHoleView Frontend - React + Vite + Electron",
+  "description": "QueueLens Frontend - React + Vite + Electron",
   "main": "dist-electron/main.cjs",
   "scripts": {
     "dev": "vite",
@@ -40,8 +40,8 @@
     "vite-plugin-electron": "^0.15.0"
   },
   "build": {
-    "appId": "com.queueholeview.app",
-    "productName": "QueueHoleView",
+    "appId": "com.queuelens.app",
+    "productName": "QueueLens",
     "directories": {
       "output": "dist-electron"
     },

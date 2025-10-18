@@ -12,7 +12,7 @@ const Sidebar = () => {
     <div className="w-64 bg-card border-r border-border">
       <div className="p-4">
         <h2 className="text-lg font-semibold text-card-foreground">
-          Queue Viewer
+          QueueLens
         </h2>
       </div>
 
