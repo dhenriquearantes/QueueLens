@@ -7,14 +7,16 @@ import Sidebar from "@/components/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { Message } from "@/api/types";
 import { getMessages } from "@/api/getMessages";
+import { LimitSelector } from "@/components/LimitSelector";
 
 const QueueMessages = () => {
   const { queueId } = useParams<{ queueId: string }>();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [limit, setLimit] = useState(20);
 
   const { data: messages } = useQuery({
-    queryKey: ['messages', queueId],
-    queryFn: () => getMessages(queueId || ''),
+    queryKey: ['messages', queueId, limit],
+    queryFn: () => getMessages(queueId || '', limit),
     enabled: !!queueId,
     staleTime: 300000,
   });
@@ -27,6 +29,7 @@ const QueueMessages = () => {
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-foreground capitalize">{queueId?.replace("-", " ")}</h1>
+            <LimitSelector onChange={setLimit} />
           </div>
         </header>
 
