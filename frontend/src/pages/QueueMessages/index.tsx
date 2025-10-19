@@ -8,6 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Message } from "@/api/types";
 import { getMessages } from "@/api/getMessages";
 import { LimitSelector } from "@/components/LimitSelector";
+import { Textarea } from "@/components/ui/textarea";
+import { Copy } from "lucide-react";
 
 const QueueMessages = () => {
   const { queueId } = useParams<{ queueId: string }>();
@@ -91,10 +93,16 @@ const QueueMessages = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">Payload JSON</p>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto text-sm">
-                  {JSON.stringify(selectedMessage.payload || {}, null, 2)}
-                </pre>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Payload JSON</p>
+                  <Copy className="w-4 h-4 mb-2 cursor-pointer text-muted-foreground hover:text-white" onClick={() => navigator.clipboard.writeText(JSON.stringify(selectedMessage.payload || {}, null, 2))} />
+                </div>
+                <Textarea
+                  value={JSON.stringify(selectedMessage.payload || {}, null, 2)}
+                  className="bg-muted p-4 overflow-auto text-sm w-full"
+                  style={{ minHeight: '400px' }}
+                  readOnly
+                />
               </div>
             </div>
           )}
