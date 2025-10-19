@@ -1,0 +1,14 @@
+services:
+  backend:
+    container_name: queuelens-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8060:8060"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./backend:/usr/app
+      - /usr/app/node_modules
+    restart: always
