@@ -5,15 +5,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import Sidebar from "@/components/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { getQueues } from "@/api/getQueues";
+import { LimitSelector } from "@/components/LimitSelector";
+import { useState, useMemo } from "react";
 
 const Queues = () => {
   const navigate = useNavigate();
+  const [limit, setLimit] = useState(20);
 
   const { data: queues } = useQuery({
     queryKey: ['queues'],
     queryFn: () => getQueues(),
     refetchInterval: 30000,
   });
+
+  const limitedQueues = useMemo(() => {
+    if (!queues) return [];
+    return queues.slice(0, limit);
+  }, [queues, limit]);
 
   const handleQueueClick = (queueName: string) => {
     navigate(`/queues/${queueName}/messages`);
@@ -27,6 +35,7 @@ const Queues = () => {
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-foreground">Filas</h1>
+            <LimitSelector onChange={setLimit} />
           </div>
         </header>
 
@@ -42,14 +51,14 @@ const Queues = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {queues?.length === 0 ? (
+                    {limitedQueues?.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={2} className="text-center text-muted-foreground">
                           Nenhuma fila encontrada
                         </TableCell>
                       </TableRow>
                     ) : (
-                      queues?.map((queue) => (
+                      limitedQueues?.map((queue) => (
                         <TableRow
                           key={queue.name}
                           className="cursor-pointer hover:bg-muted/50"
