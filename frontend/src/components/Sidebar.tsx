@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  MessageSquare, 
+import {
+  MessageSquare,
   House,
+  Server,
 } from "lucide-react";
-import QueueSelector from "./QueueSelector";
+import ServerSelector from "./ServerSelector";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  
+
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col justify-between h-screen">
       <div className="flex flex-col flex-1">
@@ -27,7 +28,7 @@ const Sidebar = () => {
               <House className="h-4 w-4" />
               <span className="ml-2">Home</span>
             </Button>
-            
+
             <div className="space-y-1">
               <Button
                 variant="ghost"
@@ -38,11 +39,20 @@ const Sidebar = () => {
                 <span className="ml-2">Filas</span>
               </Button>
             </div>
+
+            <Button
+              variant="ghost"
+              className="w-full justify-start px-3"
+              onClick={() => navigate("/servers")}
+            >
+              <Server className="h-4 w-4" />
+              <span className="ml-2">Servidores</span>
+            </Button>
           </div>
         </div>
       </div>
       <div className="p-4">
-        <QueueSelector />
+        <ServerSelector />
       </div>
     </div>
   );

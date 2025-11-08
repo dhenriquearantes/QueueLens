@@ -6,26 +6,60 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState } from "react";
 import { Separator } from "./ui/separator";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getServers, getActiveServer, activateServer, createServer } from "@/api/servers";
+import { CreateServerDTO } from "@/api/types";
 
-const rabbitServersMock = [
-  { id: "1", name: "1" },
-  { id: "2", name: "2" },
-  { id: "3", name: "3" },
-];
-
-type RabbitServer = typeof rabbitServersMock[number];
-
-const QueueSelector = () => {
+const ServerSelector = () => {
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<RabbitServer>(rabbitServersMock[0]);
+  const [formData, setFormData] = useState<CreateServerDTO>({
+    name: "",
+    url: "",
+    port: "",
+    username: "",
+    password: ""
+  });
 
-  const handleSelect = (server: RabbitServer) => {
-    setSelectedServer(server);
-    setOpen(false);
+  const { data: servers } = useQuery({
+    queryKey: ['servers'],
+    queryFn: getServers,
+    refetchInterval: 30000,
+  });
+
+  const { data: activeServer } = useQuery({
+    queryKey: ['activeServer'],
+    queryFn: getActiveServer,
+    refetchInterval: 30000,
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: activateServer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activeServer'] });
+      queryClient.invalidateQueries({ queryKey: ['servers'] });
+      queryClient.invalidateQueries({ queryKey: ['queues'] });
+      setOpen(false);
+    }
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createServer,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['servers'] });
+      queryClient.invalidateQueries({ queryKey: ['activeServer'] });
+      setDialogOpen(false);
+      setFormData({ name: "", url: "", port: "", username: "", password: "" });
+    }
+  });
+
+  const handleSelect = (serverId: string) => {
+    activateMutation.mutate(serverId);
   };
 
   const handleAddServer = () => {
+    createMutation.mutate(formData);
   };
 
   const handleTestServer = () => {
@@ -36,11 +70,11 @@ const QueueSelector = () => {
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-between items-center px-3 py-4"
+          className="w-full justify-between items-center px-3 py-4 border"
           onClick={() => setOpen((prev) => !prev)}
         >
           <span className="ml-2">
-            {selectedServer ? selectedServer.name : "Selecione um servidor RabbitMQ"}
+            {activeServer ? activeServer.name : "Servidores"}
           </span>
           {open ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
         </Button>
@@ -50,19 +84,25 @@ const QueueSelector = () => {
           <h3 className="font-medium px-2 pb-2">Servers</h3>
           <Separator />
           <div className="flex flex-col">
-            {rabbitServersMock.map((server) => (
-              <div key={server.id} className="w-full">
-                <div
-                  className="flex justify-between items-center w-full px-2 py-1 hover:bg-accent rounded-md cursor-pointer"
-                  onClick={() => handleSelect(server)}
-                >
-                  {server.name}
-                  {selectedServer.id === server.id && (
-                    <Check className="h-4 w-4 mr-2 text-white" />
-                  )}
+            {servers && servers.length > 0 ? (
+              servers.map((server) => (
+                <div key={server.id} className="w-full">
+                  <div
+                    className="flex justify-between items-center w-full px-2 py-1 hover:bg-accent rounded-md cursor-pointer"
+                    onClick={() => handleSelect(server.id)}
+                  >
+                    {server.name}
+                    {activeServer?.id === server.id && (
+                      <Check className="h-4 w-4 mr-2 text-white" />
+                    )}
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="px-2 py-2 text-sm text-muted-foreground text-center">
+                Nenhum servidor cadastrado
               </div>
-            ))}
+            )}
           </div>
           <div className="pt-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -80,6 +120,8 @@ const QueueSelector = () => {
                     <Label htmlFor="server-name">Server name</Label>
                     <Input
                       id="server-name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ex: Production Server"
                     />
                   </div>
@@ -87,20 +129,26 @@ const QueueSelector = () => {
                     <Label htmlFor="server-url">URL do Servidor</Label>
                     <Input
                       id="server-url"
-                      placeholder="Ex: amqp://localhost:5672"
+                      value={formData.url}
+                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                      placeholder="Ex: http://localhost"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="server-port">Port</Label>
                     <Input
                       id="server-port"
-                      placeholder="Ex: 5672"
+                      value={formData.port}
+                      onChange={(e) => setFormData({ ...formData, port: e.target.value })}
+                      placeholder="Ex: 15672"
                     />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="server-username">Username</Label>
                     <Input
                       id="server-username"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                       placeholder="Ex: admin"
                     />
                   </div>
@@ -108,10 +156,13 @@ const QueueSelector = () => {
                     <Label htmlFor="server-password">Password</Label>
                     <Input
                       id="server-password"
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       placeholder="Ex: admin"
                     />
                   </div>
-                  
+
                 </div>
                 <DialogFooter className="w-full">
                   <div className="flex justify-between items-center w-full">
@@ -122,8 +173,8 @@ const QueueSelector = () => {
                       <Button variant="outline" onClick={() => setDialogOpen(false)}>
                         Cancel
                       </Button>
-                      <Button onClick={handleAddServer}>
-                        Add
+                      <Button onClick={handleAddServer} disabled={createMutation.isPending}>
+                        {createMutation.isPending ? "Adding..." : "Add"}
                       </Button>
                     </div>
                   </div>
@@ -137,4 +188,4 @@ const QueueSelector = () => {
   );
 };
 
-export default QueueSelector;
+export default ServerSelector;
